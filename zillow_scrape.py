@@ -25,19 +25,11 @@ class MyWindow(QtWidgets.QMainWindow):
         self.home()
 
     def home(self):
-        quit_button = QtWidgets.QPushButton("Quit", self)
-        quit_button.clicked.connect(self.close_application)
-        quit_button.move(500,270)
-
         self.progress = self.progressBar
         self.pushButton.clicked.connect(self.inform_user)
                   
         QtWidgets.qApp.setStyle('Plastique')
         self.show()
-
-    def close_application(self):
-        print('Its closed')
-        sys.exit()
 
     def scrape_properties(self, zipcode, wb, sheet):
         rowNum = 1

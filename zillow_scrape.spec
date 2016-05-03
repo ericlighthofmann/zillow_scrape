@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['zillow_scrape.py'],
-             pathex=['C:\\Users\\Eric\\Desktop\\zillow_scrape-master'],
+             pathex=['C:\\Users\\Eric\\desktop\\zillow_scrape-master'],
              binaries=None,
              datas=None,
              hiddenimports=[],

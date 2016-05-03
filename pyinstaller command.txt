@@ -1,0 +1,3 @@
+Powershell
+
+pyinstaller --onefile --windowed --icon=Hofdata.ico zillow_scrape.py
