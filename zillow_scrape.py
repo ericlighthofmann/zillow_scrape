@@ -1,5 +1,7 @@
 import sys
-from PyQt4 import QtGui, uic, QtCore 
+import PyQt5
+import PyQt5.Qt
+from PyQt5 import QtGui, uic, QtCore, QtWidgets
 import requests
 import bs4
 import openpyxl
@@ -13,7 +15,7 @@ URLList = []
 
 #time.sleep(10)
 #GUI definitions and processes
-class MyWindow(QtGui.QMainWindow):
+class MyWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
         #.QMainWindow.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
@@ -23,14 +25,14 @@ class MyWindow(QtGui.QMainWindow):
         self.home()
 
     def home(self):
-        quit_button = QtGui.QPushButton("Quit", self)
+        quit_button = QtWidgets.QPushButton("Quit", self)
         quit_button.clicked.connect(self.close_application)
         quit_button.move(500,270)
 
         self.progress = self.progressBar
         self.pushButton.clicked.connect(self.inform_user)
                   
-        QtGui.qApp.setStyle('Plastique')
+        QtWidgets.qApp.setStyle('Plastique')
         self.show()
 
     def close_application(self):
@@ -189,6 +191,6 @@ class MyWindow(QtGui.QMainWindow):
 
             
 if __name__ == '__main__':
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     window = MyWindow()
     sys.exit(app.exec_())

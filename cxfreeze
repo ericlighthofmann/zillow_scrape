@@ -1,6 +1,0 @@
-#!C:\Dev\venv-32\Scripts\python.exe
-
-from cx_Freeze import main
-
-main()
-
