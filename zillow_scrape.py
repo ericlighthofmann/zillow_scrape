@@ -2,6 +2,7 @@ import sys
 import PyQt5
 import PyQt5.Qt
 from PyQt5 import QtGui, uic, QtCore, QtWidgets
+from PyQt5.QtWidgets import QWidget, QMessageBox, QApplication
 import requests
 import bs4
 import openpyxl
@@ -18,14 +19,14 @@ URLList = []
 class MyWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
-        #.QMainWindow.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
         uic.loadUi('mywindow.ui', self)
         self.setWindowTitle("Zillow Scrape")
         self.setWindowIcon(QtGui.QIcon('Hofdata.png'))
         self.home()
-
+    
     def home(self):
         self.progress = self.progressBar
+        self.plainTextEdit.returnPressed.connect(self.inform_user)
         self.pushButton.clicked.connect(self.inform_user)
                   
         QtWidgets.qApp.setStyle('Plastique')
@@ -94,11 +95,14 @@ class MyWindow(QtWidgets.QMainWindow):
             linknumber = linknumber + 1
             while self.completed < (linknumber/len(linkList)*100):
                 self.completed += 0.0001
+                QtCore.QCoreApplication.processEvents()
                 self.progress.setValue(self.completed)            
                     
         wb.save('zillow_info_ ' + zipcode + '.xlsx')
         logOutput = self.textEdit
         self.textEdit.moveCursor(QtGui.QTextCursor.End)
+        self.completed = 100
+        self.progress.setValue(self.completed)
         logOutput.insertPlainText('All finished! Your Excel is saved in the same folder as this .exe file.')
         print ('finito')
             
@@ -137,51 +141,55 @@ class MyWindow(QtWidgets.QMainWindow):
 
         logOutput.insertPlainText('We found ' + str(len(linkList)) + ' properties for ' + zipcode + '. Scraping now.' + '\n\n')
         self.scrape_properties(zipcode, wb, sheet)
-            
-
+    
     def inform_user(self):
         #gather zip code and log outputs
-        self.pushButton.setEnabled(False)
         zipcode = self.plainTextEdit.toPlainText()
-        #set up Excel spreadsheet
-        filename = 'zillow_info_' + zipcode + '.xlsx'
-        if not os.path.exists(filename):
-            wb = openpyxl.Workbook()
-            wb.save('zillow_info_ ' + zipcode + '.xlsx')
-        else:
-            wb = openpyxl.load_workbook(filename=filename)
-        sheet = wb.active
-        sheet.cell(row=1, column=1).value = 'address'
-        sheet.cell(row=1, column=2).value = 'type'
-        sheet.cell(row=1, column=3).value = 'price'
-        sheet.cell(row=1, column=4).value = 'beds'
-        sheet.cell(row=1, column=5).value = 'baths'
-        sheet.cell(row=1, column=6).value = 'square feet'
-        sheet.cell(row=1, column=7).value = 'lot size'
-        sheet.cell(row=1, column=8).value = 'days on Zillow'
-        sheet.cell(row=1, column=9).value = 'year built'
-        sheet.cell(row=1, column=10).value = 'URL'
-        
-        self.plainTextEdit.setReadOnly(True)
-
-        logOutput = self.textEdit
-        self.textEdit.moveCursor(QtGui.QTextCursor.End)
-        logOutput.insertPlainText('You entered a zip code of ' + zipcode + '\n')
-        logOutput.insertPlainText('Gathering links to all visible properties in your zip code...\n')
-
-        #progress bar
-        self.completed = 0
-        while self.completed < 5:
-            self.completed += 0.0001
-            self.progress.setValue(self.completed)
-
-        self.collect_links(zipcode, wb, sheet)
-
-        while self.completed < 10:
-            self.completed += 0.0001
-            self.progress.setValue(self.completed)
-
+        if len(zipcode) == 5 and zipcode.isdigit():
+            self.pushButton.setEnabled(False)
+            #set up Excel spreadsheet
+            filename = 'zillow_info_' + zipcode + '.xlsx'
+            if not os.path.exists(filename):
+                wb = openpyxl.Workbook()
+                wb.save('zillow_info_ ' + zipcode + '.xlsx')
+            else:
+                wb = openpyxl.load_workbook(filename=filename)
+            sheet = wb.active
+            sheet.cell(row=1, column=1).value = 'address'
+            sheet.cell(row=1, column=2).value = 'type'
+            sheet.cell(row=1, column=3).value = 'price'
+            sheet.cell(row=1, column=4).value = 'beds'
+            sheet.cell(row=1, column=5).value = 'baths'
+            sheet.cell(row=1, column=6).value = 'square feet'
+            sheet.cell(row=1, column=7).value = 'lot size'
+            sheet.cell(row=1, column=8).value = 'days on Zillow'
+            sheet.cell(row=1, column=9).value = 'year built'
+            sheet.cell(row=1, column=10).value = 'URL'
             
+            self.plainTextEdit.setReadOnly(True)
+
+            logOutput = self.textEdit
+            self.textEdit.moveCursor(QtGui.QTextCursor.End)
+            logOutput.insertPlainText('You entered a zip code of ' + zipcode + '\n')
+            logOutput.insertPlainText('Gathering links to all visible properties in your zip code...\n')
+
+            #progress bar
+            self.completed = 0
+            while self.completed < 5:
+                self.completed += 0.0001
+                self.progress.setValue(self.completed)
+
+            self.collect_links(zipcode, wb, sheet)
+
+            while self.completed < 10:
+                self.completed += 0.0001
+                QtCore.QCoreApplication.processEvents()
+                self.progress.setValue(self.completed)
+        else:
+            QMessageBox.information(self, "Incorrect zip code.",
+                                    "Please enter a five digit zipcode.")
+
+                      
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     window = MyWindow()
