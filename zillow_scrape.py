@@ -26,7 +26,7 @@ class MyWindow(QtWidgets.QMainWindow):
     
     def home(self):
         self.progress = self.progressBar
-        self.plainTextEdit.returnPressed.connect(self.inform_user)
+        #self.plainTextEdit.returnPressed.connect(self.inform_user)
         self.pushButton.clicked.connect(self.inform_user)
                   
         QtWidgets.qApp.setStyle('Plastique')
